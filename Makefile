@@ -7,4 +7,5 @@ init:
 
 run:
 	@echo "Running the app"
-	trunk serve
+	cargo clippy --fix & cargo fmt
+	trunk serve --port 3000 --open
