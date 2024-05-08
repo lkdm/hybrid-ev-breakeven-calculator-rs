@@ -1,0 +1,12 @@
+/**
+This is the input CSS file for Tailwind. You can add custom CSS here.
+**/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        @apply bg-gray-800;
+    }
+}
