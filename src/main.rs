@@ -16,19 +16,21 @@ fn App() -> impl IntoView {
 
 #[derive(Params, PartialEq)]
 struct CalculatorParams {
-    principle: usize,
-    rate: usize,
+    p: usize,
+    r: usize,
 }
 
 #[component]
 fn FormExample() -> impl IntoView {
-    let (principle, set_principle) = create_query_signal("p");
-    let (rate, set_rate) = create_query_signal("r");
+    let query = use_query::<CalculatorParams>();
     let (calculated, set_calculated) = create_signal(0);
 
+    let principle = move || query.with(|q| q.as_ref().map(|q| q.p).unwrap_or(1));
+    let rate = move || query.with(|q| q.as_ref().map(|q| q.r).unwrap_or(1));
+
     create_effect(move |_| {
-        let p = principle().unwrap_or(1);
-        let r = rate().unwrap_or(1);
+        let p = principle();
+        let r = rate();
         set_calculated(p * r)
     });
 
@@ -43,11 +45,9 @@ fn FormExample() -> impl IntoView {
                     <input
                         type="text"
                         name="p"
-                        value={move || principle.get()}
+                        value=principle
                         inputmode="numeric"
-                        on:input=move |ev| {
-                            set_principle(event_target_value(&ev).parse().ok())
-                        }
+                        oninput="this.form.requestSubmit()"
                     />
                 </div>
                 <div>
@@ -55,11 +55,9 @@ fn FormExample() -> impl IntoView {
                     <input
                         type="text"
                         name="r"
-                        value={move || rate.get()}
+                        value=rate
                         inputmode="numeric"
-                        on:input=move |ev| {
-                            set_rate(event_target_value(&ev).parse().ok())
-                        }
+                        oninput="this.form.requestSubmit()"
                     />
                 </div>
             </fieldset>
