@@ -22,28 +22,15 @@ struct CalculatorParams {
 
 #[component]
 fn FormExample() -> impl IntoView {
-    let query = use_query::<CalculatorParams>();
-    let principle = move || {
-        query.with(|q| {
-            q.as_ref()
-                .map(|params| params.principle)
-                .unwrap_or_default()
-        })
-    };
+    let (principle, set_principle) = create_query_signal("p");
+    let (rate, set_rate) = create_query_signal("r");
+    let (calculated, set_calculated) = create_signal(0);
 
-    let rate = move || query.with(|q| q.as_ref().map(|params| params.rate).unwrap_or_default());
-
-    let calculated = move || {
-        let principle = principle();
-        let rate = rate();
-        principle * rate
-    };
-
-    // create_effect(move |_| {
-    //     set_calculated(principle * rate, principle())
-    //   // immediately prints "Value: 0" and subscribes to `a`
-    //   // log::debug!("Value: {}", a());
-    // });
+    create_effect(move |_| {
+        let p = principle().unwrap_or(1);
+        let r = rate().unwrap_or(1);
+        set_calculated(p * r)
+    });
 
     view! {
         <div>
@@ -55,26 +42,30 @@ fn FormExample() -> impl IntoView {
                     <label for="principle">Principle</label>
                     <input
                         type="text"
-                        name="principle"
-                        value=principle
+                        name="p"
+                        value={move || principle.get()}
                         inputmode="numeric"
-                        oninput="this.form.requestSubmit()"
+                        on:input=move |ev| {
+                            set_principle(event_target_value(&ev).parse().ok())
+                        }
                     />
                 </div>
                 <div>
                     <label for="rate">Rate</label>
                     <input
                         type="text"
-                        name="rate"
-                        value=rate
+                        name="r"
+                        value={move || rate.get()}
                         inputmode="numeric"
-                        oninput="this.form.requestSubmit()"
+                        on:input=move |ev| {
+                            set_rate(event_target_value(&ev).parse().ok())
+                        }
                     />
                 </div>
             </fieldset>
             </Form>
             <h2>Calculated</h2>
-            <p>{calculated()}</p>
+            <p>{move || calculated.get()}</p>
         </div>
     }
 }
