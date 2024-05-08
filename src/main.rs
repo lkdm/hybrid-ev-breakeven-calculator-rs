@@ -5,7 +5,7 @@ use leptos_router::*;
 fn App() -> impl IntoView {
     view! {
         <Router>
-            <main class="container mx-auto justify-center">
+            <main class="container mx-auto justify-center text-gray-300">
                 <Routes>
                     <Route path="" view=FormExample/>
                 </Routes>
@@ -48,7 +48,7 @@ pub fn NumberInput(
     view! {
         <input
             type="number"
-            class="w-full"
+            class="w-full px-3 py-2 rounded-lg bg-gray-300"
             on:keypress=handle_enforce_monetary_rules
             on:input=move |ev| {
                 handle_input.set(Some(event_target_value(&ev)))
@@ -144,7 +144,7 @@ fn FormExample() -> impl IntoView {
 
     view! {
         <Form method="GET" action="">
-            <section class="flex flex-col gap-10 bg-slate-200">
+            <section class="flex flex-col gap-10">
             <fieldset class="w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4">
                 <legend>Economy Details</legend>
                 <label class="w-full block">
