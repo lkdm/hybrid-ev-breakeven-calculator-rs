@@ -1,6 +1,5 @@
 use leptos::*;
 use leptos_router::*;
-use std::dbg;
 
 #[component]
 fn App() -> impl IntoView {
