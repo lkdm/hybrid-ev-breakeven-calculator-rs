@@ -16,23 +16,27 @@ fn App() -> impl IntoView {
 
 #[derive(Params, PartialEq)]
 struct CalculatorParams {
-    p: usize,
-    r: usize,
+    principle: usize,
+    rate: usize,
 }
 
 #[component]
 fn FormExample() -> impl IntoView {
-    let query = use_query::<CalculatorParams>();
+    let (principle, set_principle) = create_query_signal::<usize>("p");
+    let (rate, set_rate) = create_query_signal::<usize>("r");
     let (calculated, set_calculated) = create_signal(0);
 
-    let principle = move || query.with(|q| q.as_ref().map(|q| q.p).unwrap_or(1));
-    let rate = move || query.with(|q| q.as_ref().map(|q| q.r).unwrap_or(1));
-
     create_effect(move |_| {
-        let p = principle();
-        let r = rate();
+        let p = principle().unwrap_or(1);
+        let r = rate().unwrap_or(1);
         set_calculated(p * r)
     });
+
+    let handle_enforce_numeric = move |ev: leptos::ev::KeyboardEvent| {
+        if !ev.key().chars().next().unwrap().is_numeric() {
+            ev.prevent_default();
+        }
+    };
 
     view! {
         <div>
@@ -43,21 +47,28 @@ fn FormExample() -> impl IntoView {
                 <div>
                     <label for="principle">Principle</label>
                     <input
-                        type="text"
-                        name="p"
-                        value=principle
+                        type="number"
+                        name="principle"
                         inputmode="numeric"
-                        oninput="this.form.requestSubmit()"
+                        on:keypress=handle_enforce_numeric
+                        on:input=move |ev| {
+                            set_principle(event_target_value(&ev).parse().ok())
+                        }
+                        prop:value=principle
                     />
                 </div>
                 <div>
                     <label for="rate">Rate</label>
                     <input
-                        type="text"
+                        type="number"
                         name="r"
-                        value=rate
+                        value={move || rate.get()}
                         inputmode="numeric"
-                        oninput="this.form.requestSubmit()"
+                        on:keypress=handle_enforce_numeric
+                        on:input=move |ev| {
+                            set_rate(event_target_value(&ev).parse().ok())
+                        }
+                        prop:value=rate
                     />
                 </div>
             </fieldset>
