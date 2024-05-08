@@ -5,16 +5,11 @@ use leptos_router::*;
 fn App() -> impl IntoView {
     view! {
         <Router>
-            <div class="flex justify-center">
-                <main class="max-w-screen-md">
-                <div class="bg-blue-500 text-white p-4">
-                        "Hello, Tailwind!"
-                    </div>
-                    <Routes>
-                        <Route path="" view=FormExample/>
-                    </Routes>
-                </main>
-            </div>
+            <main class="container mx-auto justify-center">
+                <Routes>
+                    <Route path="" view=FormExample/>
+                </Routes>
+            </main>
         </Router>
     }
 }
@@ -53,6 +48,7 @@ pub fn NumberInput(
     view! {
         <input
             type="number"
+            class="w-full"
             on:keypress=handle_enforce_monetary_rules
             on:input=move |ev| {
                 handle_input.set(Some(event_target_value(&ev)))
@@ -147,54 +143,53 @@ fn FormExample() -> impl IntoView {
     });
 
     view! {
-        <div>
-            <p class="bg-red-100">Test</p>
-            <h2>Hybrid EV Breakeven Calculator</h2>
-            <Form method="GET" action="">
-            <fieldset>
+        <Form method="GET" action="">
+            <section class="flex flex-col gap-10 bg-slate-200">
+            <fieldset class="w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4">
                 <legend>Economy Details</legend>
-                <div>
-                    <label>Estimated fuel price</label>
+                <label class="w-full block">
+                    Estimated fuel price
                     <NumberInput handle_input={set_fuel_cost} value={fuel_cost}/>
-                </div>
+                </label>
             </fieldset>
-            <fieldset>
+            <fieldset class="w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4">
                 <legend>Personal Details</legend>
-                <div>
-                    <label>Kilometres driven per year</label>
+                <label>
+                    Kilometres driven per year
                     <NumberInput handle_input={set_annual_km_driven} value={annual_km_driven}/>
-                </div>
+                </label>
             </fieldset>
-            <fieldset>
+            <fieldset class="w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4">
                 <legend>Hybrid Vehicle Details</legend>
-                <div>
-                    <label>Estimated drive-away price</label>
+                <label>
+                    Estimated drive-away price
                     <NumberInput handle_input={set_hybrid_upfront_cost} value={hybrid_upfront_cost}/>
-                </div>
-                <div>
-                    <label>Estimated fuel economy (L/100km)</label>
+                </label>
+                <label>
+                    Estimated fuel economy (L/100km)
                     <NumberInput handle_input={set_hybrid_efficiency} value={hybrid_efficiency}/>
-                </div>
+                </label>
                 <div>
                     <p>Petrol cost/km: {hybrid_fuel_cost}</p>
                 </div>
             </fieldset>
-            <fieldset>
+            <fieldset class="w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4">
                 <legend>Petrol Vehicle Details</legend>
-                <div>
-                    <label>Estimated drive-away price</label>
+                <label>
+                    Estimated drive-away price
                     <NumberInput handle_input={set_petrol_upfront_cost} value={petrol_upfront_cost}/>
-                </div>
-                <div>
-                    <label>Estimated fuel economy (L/100km)</label>
+                </label>
+                <label>
+                    Estimated fuel economy (L/100km)
                     <NumberInput handle_input={set_petrol_efficiency} value={petrol_efficiency}/>
-                </div>
+                </label>
                 <div>
                     <p>Petrol cost/km: {petrol_fuel_cost}</p>
                 </div>
-                </fieldset>
-
+            </fieldset>
+            </section>
             </Form>
+            <section>
             <h2>Outcome</h2>
             <div>
                 <p>Upfront cost difference: {upfront_cost_difference}</p>
@@ -202,7 +197,7 @@ fn FormExample() -> impl IntoView {
                 <p>Breakeven point: {breakeven_point}</p>
                 <p>Breakeven point in years: {breakeven_point_years}</p>
             </div>
-        </div>
+            </section>
     }
 }
 

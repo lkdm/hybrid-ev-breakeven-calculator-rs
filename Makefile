@@ -5,7 +5,7 @@ init:
 	rustup override set nightly
 	rustup target add wasm32-unknown-unknown
 	npm i -g tailwindcss
-	tailwindcss -o ./tailwind.css
+	# tailwindcss -o ./tailwind.css
 
 run:
 	@echo "Running the app"
