@@ -70,6 +70,8 @@ fn FormExample() -> impl IntoView {
         create_query_signal::<String>("petrol_upfront_cost");
     let (petrol_efficiency, set_petrol_efficiency) =
         create_query_signal::<String>("petrol_efficiency");
+    let (annual_km_driven, set_annual_km_driven) =
+        create_query_signal::<String>("annual_km_driven");
 
     let (hybrid_fuel_cost, set_hybrid_fuel_cost) = create_signal(String::new());
     let (petrol_fuel_cost, set_petrol_fuel_cost) = create_signal(String::new());
@@ -77,6 +79,7 @@ fn FormExample() -> impl IntoView {
     let (breakeven_point, set_breakeven_point) = create_signal(String::new());
     let (per_kilometre_fuel_cost_difference, set_per_kilometre_fuel_cost_difference) =
         create_signal(String::new());
+    let (breakeven_point_years, set_breakeven_point_years) = create_signal(String::new());
 
     create_effect(move |_| {
         let _fuel_cost: f64 = fuel_cost.get().unwrap().parse().ok().unwrap_or(0.0);
@@ -116,6 +119,8 @@ fn FormExample() -> impl IntoView {
             _per_kilometre_fuel_cost_difference
         );
 
+        let _annual_km_driven: f64 = annual_km_driven.get().unwrap().parse().ok().unwrap_or(0.0);
+
         // Calculate upfront cost difference
         let _upfront_cost_difference = _hybrid_upfront_cost - _petrol_upfront_cost;
 
@@ -123,6 +128,7 @@ fn FormExample() -> impl IntoView {
         let _breakeven_point_kilometres =
             _upfront_cost_difference / _per_kilometre_fuel_cost_difference;
         logging::log!("Breakeven point: {}", _breakeven_point_kilometres);
+        let _breakeven_point_years = _breakeven_point_kilometres / _annual_km_driven;
 
         // Setters
         set_hybrid_fuel_cost(format!("{:.2}", _hybrid_fuel_cost));
@@ -133,6 +139,7 @@ fn FormExample() -> impl IntoView {
             "{:.2}",
             _per_kilometre_fuel_cost_difference
         ));
+        set_breakeven_point_years(format!("{:.2} years", _breakeven_point_years));
     });
 
     view! {
@@ -142,8 +149,15 @@ fn FormExample() -> impl IntoView {
             <fieldset>
                 <legend>Economy Details</legend>
                 <div>
-                    <label for="principle">Estimated fuel price</label>
+                    <label>Estimated fuel price</label>
                     <NumberInput handle_input={set_fuel_cost} value={fuel_cost}/>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Personal Details</legend>
+                <div>
+                    <label>Kilometres driven per year</label>
+                    <NumberInput handle_input={set_annual_km_driven} value={annual_km_driven}/>
                 </div>
             </fieldset>
             <fieldset>
@@ -181,6 +195,7 @@ fn FormExample() -> impl IntoView {
                 <p>Upfront cost difference: {upfront_cost_difference}</p>
                 <p>Per kilometre fuel cost difference: {per_kilometre_fuel_cost_difference}</p>
                 <p>Breakeven point: {breakeven_point}</p>
+                <p>Breakeven point in years: {breakeven_point_years}</p>
             </div>
         </div>
     }
