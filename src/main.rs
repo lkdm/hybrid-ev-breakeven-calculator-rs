@@ -5,11 +5,16 @@ use leptos_router::*;
 fn App() -> impl IntoView {
     view! {
         <Router>
-            <main>
-                <Routes>
-                    <Route path="" view=FormExample/>
-                </Routes>
-            </main>
+            <div class="flex justify-center">
+                <main class="max-w-screen-md">
+                <div class="bg-blue-500 text-white p-4">
+                        "Hello, Tailwind!"
+                    </div>
+                    <Routes>
+                        <Route path="" view=FormExample/>
+                    </Routes>
+                </main>
+            </div>
         </Router>
     }
 }
@@ -143,6 +148,7 @@ fn FormExample() -> impl IntoView {
 
     view! {
         <div>
+            <p class="bg-red-100">Test</p>
             <h2>Hybrid EV Breakeven Calculator</h2>
             <Form method="GET" action="">
             <fieldset>
@@ -162,11 +168,11 @@ fn FormExample() -> impl IntoView {
             <fieldset>
                 <legend>Hybrid Vehicle Details</legend>
                 <div>
-                    <label for="rate">Estimated drive-away price</label>
+                    <label>Estimated drive-away price</label>
                     <NumberInput handle_input={set_hybrid_upfront_cost} value={hybrid_upfront_cost}/>
                 </div>
                 <div>
-                    <label for="rate">Estimated fuel economy (L/100km)</label>
+                    <label>Estimated fuel economy (L/100km)</label>
                     <NumberInput handle_input={set_hybrid_efficiency} value={hybrid_efficiency}/>
                 </div>
                 <div>
@@ -176,11 +182,11 @@ fn FormExample() -> impl IntoView {
             <fieldset>
                 <legend>Petrol Vehicle Details</legend>
                 <div>
-                    <label for="rate">Estimated drive-away price</label>
+                    <label>Estimated drive-away price</label>
                     <NumberInput handle_input={set_petrol_upfront_cost} value={petrol_upfront_cost}/>
                 </div>
                 <div>
-                    <label for="rate">Estimated fuel economy (L/100km)</label>
+                    <label>Estimated fuel economy (L/100km)</label>
                     <NumberInput handle_input={set_petrol_efficiency} value={petrol_efficiency}/>
                 </div>
                 <div>
