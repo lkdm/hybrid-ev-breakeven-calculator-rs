@@ -14,5 +14,5 @@ run:
 
 build:
 	@echo "Building the app"
-	NODE_ENV=production tailwindcss -c ./tailwind.config.js -o ./tailwind.css --minify
+	NODE_ENV=production tailwindcss -c ./tailwind.config.js -i ./src/style.css -o ./tailwind.css --minify
 	trunk build --release
