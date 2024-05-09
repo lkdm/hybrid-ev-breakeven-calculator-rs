@@ -5,9 +5,11 @@ use leptos_router::*;
 use rust_decimal::prelude::*;
 use serde::{Deserialize, Serialize};
 use web_sys::SubmitEvent;
+extern crate console_error_panic_hook;
 
 #[component]
 fn App() -> impl IntoView {
+    console_error_panic_hook::set_once();
     view! {
         <Router>
             <main class="container mx-auto justify-center text-gray-300">
@@ -21,28 +23,10 @@ fn App() -> impl IntoView {
 
 #[component]
 pub fn NumberInput(name: String, value: String) -> impl IntoView {
+    // A NumberInput enforces that the input can parse into a Decimal object.
+    // Even though the Form takes care of saving the data to state, this input
+    // has its own signal, because it needs to parse the input.
     let (state, set_state) = create_signal(value);
-    // let handle_enforce_monetary_rules = move |ev: leptos::ev::KeyboardEvent| {
-    //     let key = ev.key().chars().next().unwrap();
-    //     let input = event_target_value(&ev);
-
-    //     let void_key: Option<bool> = match key {
-    //         // Prevent multiple decimal points, or a decimal directly after a minus.
-    //         '.' => Some(input.ends_with('-') || input.contains('.')),
-    //         // Prevent minus sign if it's not the first character.
-    //         '-' => Some(!input.is_empty()),
-    //         _ => Some(
-    //             // Prevent any non-numeric characters, except for the minus sign and decimal point.
-    //             !(key.is_numeric() || key == '.' || key == '-'),
-    //         ),
-    //     };
-
-    //     if void_key.unwrap() {
-    //         ev.prevent_default();
-    //         return;
-    //     }
-    // };
-
     let handle_input = move |ev: leptos::ev::Event| {
         let mut input = event_target_value(&ev);
         input = parse_dec::parse_decimal(input);
@@ -54,9 +38,7 @@ pub fn NumberInput(name: String, value: String) -> impl IntoView {
             type="text"
             name={name}
             class="w-full px-3 py-2 rounded-lg bg-gray-300"
-            // on:keypress=handle_enforce_monetary_rules
             on:input=handle_input
-            // on:blur=handle_input
             onchange="this.form.requestSubmit()"
             prop:value=move || state.get()
         />
@@ -64,49 +46,99 @@ pub fn NumberInput(name: String, value: String) -> impl IntoView {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct Vehicle {
-    upfront_cost: Decimal,
-    fuel_litres_consumption_per_km: Decimal,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
 struct InputState {
     fuel_cost: Decimal,
-    // annual_km_driven: Decimal,
-    // fuel_vehicle: Vehicle,
-    // hybrid_vehicle: Vehicle,
+    annual_km_driven: Decimal,
+    ice_upfront_cost: Decimal,
+    ice_fuel_litres_per_km: Decimal,
+    hybrid_upfront_cost: Decimal,
+    hybrid_fuel_litres_per_km: Decimal,
 }
 
 impl Default for InputState {
     fn default() -> Self {
         InputState {
             fuel_cost: Decimal::ZERO,
-            // annual_km_driven: Decimal::ZERO,
-            // fuel_vehicle: Vehicle {
-            //     upfront_cost: Decimal::ZERO,
-            //     fuel_litres_consumption_per_km: Decimal::ZERO,
-            // },
-            // hybrid_vehicle: Vehicle {
-            //     upfront_cost: Decimal::ZERO,
-            //     fuel_litres_consumption_per_km: Decimal::ZERO,
-            // },
+            annual_km_driven: Decimal::ZERO,
+            ice_upfront_cost: Decimal::ZERO,
+            ice_fuel_litres_per_km: Decimal::ZERO,
+            hybrid_upfront_cost: Decimal::ZERO,
+            hybrid_fuel_litres_per_km: Decimal::ZERO,
         }
     }
 }
 
-// #[derive(Clone)]
-// struct OutputState {
-//     hybrid_fuel_cost: Decimal,
-//     petrol_fuel_cost: Decimal,
-//     upfront_cost_difference: Decimal,
-//     per_kilometre_fuel_cost_difference: Decimal,
-//     breakeven_point_km: Decimal,
-//     breakeven_point_years: Decimal,
-// }
+#[derive(Clone)]
+struct OutputState {
+    hybrid_fuel_cost: Decimal,
+    petrol_fuel_cost: Decimal,
+    upfront_cost_difference: Decimal,
+    per_kilometre_fuel_cost_difference: Decimal,
+    breakeven_point_km: Decimal,
+    breakeven_point_years: Decimal,
+}
+impl Default for OutputState {
+    fn default() -> Self {
+        OutputState {
+            hybrid_fuel_cost: Decimal::ZERO,
+            petrol_fuel_cost: Decimal::ZERO,
+            upfront_cost_difference: Decimal::ZERO,
+            per_kilometre_fuel_cost_difference: Decimal::ZERO,
+            breakeven_point_km: Decimal::ZERO,
+            breakeven_point_years: Decimal::ZERO,
+        }
+    }
+}
+
+#[component]
+fn FieldSet(legend: String, children: Children) -> impl IntoView {
+    let children = children().nodes.into_iter().collect_view();
+    view! {
+        <fieldset class="w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4">
+            <legend>{legend}</legend>
+            {children}
+        </fieldset>
+    }
+}
+
+#[component]
+fn Field(label: String, children: Children) -> impl IntoView {
+    let children = children().nodes.into_iter().collect_view();
+    view! {
+        <label class="w-full block">
+            {label}
+            {children}
+        </label>
+    }
+}
+
+struct ArithmeticError;
+
+fn break_even_point_km(
+    upfront_cost_difference: Decimal,
+    per_kilometre_fuel_cost_difference: Decimal,
+) -> Result<Decimal, ArithmeticError> {
+    if per_kilometre_fuel_cost_difference == Decimal::ZERO {
+        return Err(ArithmeticError);
+    }
+    let breakeven_point_km = upfront_cost_difference / per_kilometre_fuel_cost_difference;
+    Ok(breakeven_point_km)
+}
+
+fn break_even_point_years(
+    breakeven_point_km: Decimal,
+    annual_km_driven: Decimal,
+) -> Result<Decimal, ArithmeticError> {
+    if annual_km_driven == Decimal::ZERO {
+        return Err(ArithmeticError);
+    }
+    let breakeven_point_years = breakeven_point_km / annual_km_driven;
+    Ok(breakeven_point_years)
+}
 
 #[component]
 fn FormExample() -> impl IntoView {
-    // let (result, set_result) = create_signal::<Option<OutputState>>(None);
+    let (result, set_result) = create_signal::<OutputState>(OutputState::default());
     // let state = expect_context::<RwSignal<GlobalState>>();
     // let input = (move || state.with(|state| state.input_state.clone()))();
 
@@ -119,70 +151,93 @@ fn FormExample() -> impl IntoView {
                 return;
             }
         };
+        // TODO: DivisionByZero error
+        let hybrid_fuel_cost = data.fuel_cost * data.hybrid_fuel_litres_per_km;
+        let petrol_fuel_cost = data.fuel_cost * data.ice_fuel_litres_per_km;
+        let upfront_cost_difference = data.hybrid_upfront_cost - data.ice_upfront_cost;
+        let per_kilometre_fuel_cost_difference = petrol_fuel_cost - hybrid_fuel_cost;
+        let breakeven_point_km =
+            break_even_point_km(upfront_cost_difference, per_kilometre_fuel_cost_difference)
+                .unwrap_or(Decimal::ZERO);
+        let breakeven_point_years =
+            break_even_point_years(breakeven_point_km, data.annual_km_driven)
+                .unwrap_or(Decimal::ZERO);
+        let output = OutputState {
+            hybrid_fuel_cost,
+            petrol_fuel_cost,
+            upfront_cost_difference,
+            per_kilometre_fuel_cost_difference,
+            breakeven_point_km,
+            breakeven_point_years,
+        };
+        set_result(output);
         logging::log!("Data: {:?}", data);
     };
 
     view! {
         <form method="GET" on:submit=handle_submit>
             <section class="flex flex-col gap-10">
-                <fieldset class="w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4">
-                    <legend>Economy Details</legend>
-                    <label class="w-full block">
-                        Estimated fuel price
+                <FieldSet legend="Economy Details".to_string()>
+                    <Field label="Estimated fuel price".to_string()>
                         <NumberInput
                             name="fuel_cost".to_string()
                             value="0.00".to_string()
                         />
-                    </label>
-                </fieldset>
+                    </Field>
+                </FieldSet>
+                <FieldSet legend="Personal Details".to_string()>
+                    <Field label="Kilometres driven per year".to_string()>
+                        <NumberInput
+                            name="annual_km_driven".to_string()
+                            value="0.00".to_string()
+                        />
+                    </Field>
+                </FieldSet>
+                <FieldSet legend="Hybrid Vehicle Details".to_string()>
+                    <Field label="Estimated drive-away price".to_string()>
+                        <NumberInput
+                            name="hybrid_upfront_cost".to_string()
+                            value="0.00".to_string()
+                        />
+                    </Field>
+                    <Field label="Estimated fuel economy (L/100km)".to_string()>
+                        <NumberInput
+                            name="hybrid_fuel_litres_per_km".to_string()
+                            value="0.00".to_string()
+                        />
+                    </Field>
+                    <div>
+                        <p>Petrol cost/km: {move || result.get().hybrid_fuel_cost.round_dp(2).to_string()}</p>
+                    </div>
+                </FieldSet>
+                <FieldSet legend="Petrol Vehicle Details".to_string()>
+                    <Field label="Estimated drive-away price".to_string()>
+                        <NumberInput
+                            name="ice_upfront_cost".to_string()
+                            value="0.00".to_string()
+                        />
+                    </Field>
+                    <Field label="Estimated fuel economy (L/100km)".to_string()>
+                        <NumberInput
+                            name="ice_fuel_litres_per_km".to_string()
+                            value="0.00".to_string()
+                        />
+                    </Field>
+                    <div>
+                        <p>Petrol cost/km: {move || result.get().petrol_fuel_cost.round_dp(2).to_string()}</p>
+                    </div>
+                </FieldSet>
             </section>
         </form>
-            // <fieldset class="w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4">
-            //     <legend>Personal Details</legend>
-            //     <label>
-            //         Kilometres driven per year
-            //         <NumberInput handle_input={set_annual_km_driven} value={annual_km_driven}/>
-            //     </label>
-            // </fieldset>
-            // <fieldset class="w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4">
-            //     <legend>Hybrid Vehicle Details</legend>
-            //     <label>
-            //         Estimated drive-away price
-            //         <NumberInput handle_input={set_hybrid_upfront_cost} value={hybrid_upfront_cost}/>
-            //     </label>
-            //     <label>
-            //         Estimated fuel economy (L/100km)
-            //         <NumberInput handle_input={set_hybrid_efficiency} value={hybrid_efficiency}/>
-            //     </label>
-            //     <div>
-            //         <p>Petrol cost/km: {hybrid_fuel_cost}</p>
-            //     </div>
-            // </fieldset>
-            // <fieldset class="w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4">
-            //     <legend>Petrol Vehicle Details</legend>
-            //     <label>
-            //         Estimated drive-away price
-            //         <NumberInput handle_input={set_petrol_upfront_cost} value={petrol_upfront_cost}/>
-            //     </label>
-            //     <label>
-            //         Estimated fuel economy (L/100km)
-            //         <NumberInput handle_input={set_petrol_efficiency} value={petrol_efficiency}/>
-            //     </label>
-            //     <div>
-            //         <p>Petrol cost/km: {petrol_fuel_cost}</p>
-            //     </div>
-            // </fieldset>
-            // </section>
-            // </ActionForm>
-            // <section>
-            // <h2>Outcome</h2>
-            // <div>
-            //     <p>Upfront cost difference: {upfront_cost_difference}</p>
-            //     <p>Per kilometre fuel cost difference: {per_kilometre_fuel_cost_difference}</p>
-            //     <p>Breakeven point: {breakeven_point}</p>
-            //     <p>Breakeven point in years: {breakeven_point_years}</p>
-            // </div>
-            // </section>
+        <section>
+            <h2>Outcome</h2>
+            <div>
+                <p>Upfront cost difference: {move || result.get().upfront_cost_difference.round_dp(2).to_string()}</p>
+                <p>Per kilometre fuel cost difference: {move || result.get().per_kilometre_fuel_cost_difference.round_dp(2).to_string()}</p>
+                <p>Breakeven point: {move || result.get().breakeven_point_km.round_dp(2).to_string()} km</p>
+                <p>Breakeven point in years: {move || result.get().breakeven_point_years.round_dp(2).to_string()}</p>
+            </div>
+        </section>
     }
 }
 

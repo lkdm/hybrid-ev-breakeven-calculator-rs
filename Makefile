@@ -16,3 +16,7 @@ build:
 	@echo "Building the app"
 	NODE_ENV=production tailwindcss -c ./tailwind.config.js -i ./src/style.css -o ./tailwind.css --minify
 	trunk build --release
+
+test:
+	@echo "Running tests"
+	cargo test
