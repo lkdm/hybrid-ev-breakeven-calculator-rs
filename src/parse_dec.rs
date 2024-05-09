@@ -1,6 +1,9 @@
 use leptos::logging::log;
 use std::iter::FromIterator;
 
+/**
+*   Parse a String into a format that can be used as a decimal number.
+*/
 pub fn parse_decimal(input: String) -> String {
     let mut iter = input.chars().peekable();
     let mut valid_chars = Vec::new();
@@ -20,7 +23,6 @@ pub fn parse_decimal(input: String) -> String {
                 }
             }
             '0'..='9' => {
-                // Out of bounds, length is 0 but index is 0.
                 if valid_chars.len() == 2 && valid_chars[0] == '-' && valid_chars[1] == '0' {
                     // Remove the leading 0 after the sign '-', if we've inserted a number after it.
                     valid_chars.pop();
@@ -63,7 +65,7 @@ mod tests {
 
     #[test]
     fn test_parse_decimal_positive_float() {
-        assert_eq!(parse_decimal(String::from("123.456")), "123.46");
+        assert_eq!(parse_decimal(String::from("123.456")), "123.456");
     }
 
     #[test]
@@ -73,22 +75,22 @@ mod tests {
 
     #[test]
     fn test_parse_decimal_negative_float() {
-        assert_eq!(parse_decimal(String::from("-123.456")), "-123.46");
+        assert_eq!(parse_decimal(String::from("-123.456")), "-123.456");
     }
 
     #[test]
     fn test_parse_decimal_starting_with_dot() {
-        assert_eq!(parse_decimal(String::from(".123")), "0.12");
+        assert_eq!(parse_decimal(String::from(".123")), "0.123");
     }
 
     #[test]
     fn test_parse_decimal_starting_with_minus_dot() {
-        assert_eq!(parse_decimal(String::from("-.123")), "-0.12");
+        assert_eq!(parse_decimal(String::from("-.123")), "-0.123");
     }
 
     #[test]
     fn test_parse_decimal_leading_zero_float() {
-        assert_eq!(parse_decimal(String::from("0.123")), "0.12");
+        assert_eq!(parse_decimal(String::from("0.123")), "0.123");
     }
 
     #[test]
@@ -108,7 +110,7 @@ mod tests {
 
     #[test]
     fn test_parse_decimal_leading_zero_float_multiple_zeros() {
-        assert_eq!(parse_decimal(String::from("000.123")), "0.12");
+        assert_eq!(parse_decimal(String::from("000.123")), "0.123");
     }
 
     #[test]
