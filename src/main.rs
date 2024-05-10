@@ -1,3 +1,4 @@
+mod hooks;
 mod parse_dec;
 
 use leptos::*;
@@ -137,22 +138,13 @@ fn break_even_point_years(
     Ok(breakeven_point_years)
 }
 
-trait QueryString {
-    fn to_query_string(&self) -> String;
-}
-
-impl QueryString for InputState {
-    fn to_query_string(&self) -> String {
-        serde_urlencoded::to_string(self).unwrap()
-    }
-}
-
 #[component]
 fn FormExample() -> impl IntoView {
     let (result, set_result) = create_signal::<OutputState>(OutputState::default());
-    let query = use_query::<InputState>();
-    let navigate = use_navigate();
-    let location = use_location();
+    let (query, set_query) = hooks::create_query_struct_signal::<InputState>();
+    let default_values = query.get().unwrap();
+
+    logging::log!("{:?}", default_values);
 
     // let state = expect_context::<RwSignal<GlobalState>>();
     // let input = (move || state.with(|state| state.input_state.clone()))();
@@ -166,13 +158,13 @@ fn FormExample() -> impl IntoView {
                 return;
             }
         };
-        let qs = data.to_query_string();
-        let path = location.pathname.get_untracked();
-        let hash = location.hash.get_untracked();
-        let new_url = format!("{path}?{qs}{hash}");
-        navigate(&new_url, NavigateOptions::default());
+        set_query(Some(data.clone()));
+        // let qs = data.to_query_string();
+        // let path = location.pathname.get_untracked();
+        // let hash = location.hash.get_untracked();
+        // let new_url = format!("{path}?{qs}{hash}");
+        // navigate(&new_url, NavigateOptions::default());
         // use_navigate().push(format!("/?{}", qs));
-        logging::log!("QueryString: {:?}", qs);
         // update_query_string(data);
         // TODO: DivisionByZero error
         let hybrid_fuel_cost = data.fuel_cost * data.hybrid_fuel_litres_per_km;
@@ -204,7 +196,7 @@ fn FormExample() -> impl IntoView {
                     <Field label="Estimated fuel price".to_string()>
                         <NumberInput
                             name="fuel_cost".to_string()
-                            value="0.00".to_string()
+                            value={default_values.fuel_cost.to_string()}
                         />
                     </Field>
                 </FieldSet>
@@ -212,7 +204,7 @@ fn FormExample() -> impl IntoView {
                     <Field label="Kilometres driven per year".to_string()>
                         <NumberInput
                             name="annual_km_driven".to_string()
-                            value="0.00".to_string()
+                            value={default_values.annual_km_driven.to_string()}
                         />
                     </Field>
                 </FieldSet>
@@ -220,13 +212,13 @@ fn FormExample() -> impl IntoView {
                     <Field label="Estimated drive-away price".to_string()>
                         <NumberInput
                             name="hybrid_upfront_cost".to_string()
-                            value="0.00".to_string()
+                            value={default_values.hybrid_upfront_cost.to_string()}
                         />
                     </Field>
                     <Field label="Estimated fuel economy (L/100km)".to_string()>
                         <NumberInput
                             name="hybrid_fuel_litres_per_km".to_string()
-                            value="0.00".to_string()
+                            value={default_values.hybrid_fuel_litres_per_km.to_string()}
                         />
                     </Field>
                     <div>
@@ -237,13 +229,13 @@ fn FormExample() -> impl IntoView {
                     <Field label="Estimated drive-away price".to_string()>
                         <NumberInput
                             name="ice_upfront_cost".to_string()
-                            value="0.00".to_string()
+                            value={default_values.ice_upfront_cost.to_string()}
                         />
                     </Field>
                     <Field label="Estimated fuel economy (L/100km)".to_string()>
                         <NumberInput
                             name="ice_fuel_litres_per_km".to_string()
-                            value="0.00".to_string()
+                            value={default_values.ice_fuel_litres_per_km.to_string()}
                         />
                     </Field>
                     <div>
