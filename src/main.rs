@@ -4,6 +4,7 @@ use leptos::*;
 use leptos_router::*;
 use rust_decimal::prelude::*;
 use serde::{Deserialize, Serialize};
+use serde_urlencoded;
 use web_sys::SubmitEvent;
 extern crate console_error_panic_hook;
 
@@ -45,7 +46,7 @@ pub fn NumberInput(name: String, value: String) -> impl IntoView {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Params)]
 struct InputState {
     fuel_cost: Decimal,
     annual_km_driven: Decimal,
@@ -136,9 +137,23 @@ fn break_even_point_years(
     Ok(breakeven_point_years)
 }
 
+trait QueryString {
+    fn to_query_string(&self) -> String;
+}
+
+impl QueryString for InputState {
+    fn to_query_string(&self) -> String {
+        serde_urlencoded::to_string(self).unwrap()
+    }
+}
+
 #[component]
 fn FormExample() -> impl IntoView {
     let (result, set_result) = create_signal::<OutputState>(OutputState::default());
+    let query = use_query::<InputState>();
+    let navigate = use_navigate();
+    let location = use_location();
+
     // let state = expect_context::<RwSignal<GlobalState>>();
     // let input = (move || state.with(|state| state.input_state.clone()))();
 
@@ -151,6 +166,14 @@ fn FormExample() -> impl IntoView {
                 return;
             }
         };
+        let qs = data.to_query_string();
+        let path = location.pathname.get_untracked();
+        let hash = location.hash.get_untracked();
+        let new_url = format!("{path}?{qs}{hash}");
+        navigate(&new_url, NavigateOptions::default());
+        // use_navigate().push(format!("/?{}", qs));
+        logging::log!("QueryString: {:?}", qs);
+        // update_query_string(data);
         // TODO: DivisionByZero error
         let hybrid_fuel_cost = data.fuel_cost * data.hybrid_fuel_litres_per_km;
         let petrol_fuel_cost = data.fuel_cost * data.ice_fuel_litres_per_km;
