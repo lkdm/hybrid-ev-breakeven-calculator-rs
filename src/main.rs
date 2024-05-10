@@ -13,11 +13,29 @@ fn App() -> impl IntoView {
     console_error_panic_hook::set_once();
     view! {
         <Router>
+            <header class="bg-gray-800 text-white text-center p-4">
+                <h1 class="text-2xl">Hybrid EV Breakeven Calculator</h1>
+                <nav>
+                    <ul class="flex justify-center space-x-4">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/lkdm/hybrid-ev-breakeven-calculator-rs">Github Repository</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
             <main class="container mx-auto justify-center text-gray-300">
                 <Routes>
                     <Route path="" view=FormExample/>
                 </Routes>
             </main>
+            <footer class="bg-gray-800 text-white text-center p-4">
+                <aside>
+                    Built with Rust and Tailwind.
+                </aside>
+            </footer>
         </Router>
     }
 }
@@ -38,7 +56,7 @@ pub fn NumberInput(name: String, value: String) -> impl IntoView {
         <input
             type="text"
             name={name}
-            class="w-full px-3 py-2 rounded-lg bg-gray-300"
+            class="w-full px-3 py-2 rounded-lg bg-transparent flex h-10 w-full rounded-md border border-white text-sm"
             on:input=handle_input
             onchange="this.form.requestSubmit()"
             prop:value=move || state.get()
@@ -95,8 +113,13 @@ impl Default for OutputState {
 fn FieldSet(legend: String, children: Children) -> impl IntoView {
     let children = children().nodes.into_iter().collect_view();
     view! {
-        <fieldset class="w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4">
-            <legend>{legend}</legend>
+        <fieldset class="
+            w-full grid sm:grid-cols-1 md:grid-cols-3 gap-4 border border-gray-700 rounded-lg
+            px-3 py-2
+        ">
+        //  class="w-full px-3 py-2 rounded-lg bg-transparent flex h-10 w-full rounded-md border border-white text-sm"
+
+            <legend class="text-xl">{legend}</legend>
             {children}
         </fieldset>
     }
@@ -106,7 +129,7 @@ fn FieldSet(legend: String, children: Children) -> impl IntoView {
 fn Field(label: String, children: Children) -> impl IntoView {
     let children = children().nodes.into_iter().collect_view();
     view! {
-        <label class="w-full block">
+        <label class="w-full block grid w-full max-w-sm items-center gap-1.5">
             {label}
             {children}
         </label>
@@ -178,15 +201,13 @@ fn FormExample() -> impl IntoView {
     view! {
         <form method="GET" on:submit=handle_submit>
             <section class="flex flex-col gap-10">
-                <FieldSet legend="Economy Details".to_string()>
+                <FieldSet legend="General Details".to_string()>
                     <Field label="Estimated fuel price".to_string()>
                         <NumberInput
                             name="fuel_cost".to_string()
                             value={default_values.fuel_cost.to_string()}
                         />
                     </Field>
-                </FieldSet>
-                <FieldSet legend="Personal Details".to_string()>
                     <Field label="Kilometres driven per year".to_string()>
                         <NumberInput
                             name="annual_km_driven".to_string()
@@ -194,7 +215,7 @@ fn FormExample() -> impl IntoView {
                         />
                     </Field>
                 </FieldSet>
-                <FieldSet legend="Hybrid Vehicle Details".to_string()>
+                <FieldSet legend="Hybrid Car Details".to_string()>
                     <Field label="Estimated drive-away price".to_string()>
                         <NumberInput
                             name="hybrid_upfront_cost".to_string()
@@ -211,7 +232,7 @@ fn FormExample() -> impl IntoView {
                         <p>Petrol cost/km: {move || result.get().hybrid_fuel_cost.round_dp(2).to_string()}</p>
                     </div>
                 </FieldSet>
-                <FieldSet legend="Petrol Vehicle Details".to_string()>
+                <FieldSet legend="Fuel Vehicle Details".to_string()>
                     <Field label="Estimated drive-away price".to_string()>
                         <NumberInput
                             name="ice_upfront_cost".to_string()
@@ -232,12 +253,20 @@ fn FormExample() -> impl IntoView {
         </form>
         <section>
             <h2>Outcome</h2>
-            <div>
-                <p>Upfront cost difference: {move || result.get().upfront_cost_difference.round_dp(2).to_string()}</p>
-                <p>Per kilometre fuel cost difference: {move || result.get().per_kilometre_fuel_cost_difference.round_dp(2).to_string()}</p>
-                <p>Breakeven point: {move || result.get().breakeven_point_km.round_dp(2).to_string()} km</p>
-                <p>Breakeven point in years: {move || result.get().breakeven_point_years.round_dp(2).to_string()}</p>
-            </div>
+            <dl>
+                <dt>Upfront cost difference</dt>
+                <dd>{move || result.get().upfront_cost_difference.round_dp(2).to_string()}</dd>
+
+                <dt>Per kilometre fuel cost difference</dt>
+                <dd>{move || result.get().per_kilometre_fuel_cost_difference.round_dp(2).to_string()}</dd>
+            </dl>
+
+            <dl>
+                <dt>Breakeven point (km)</dt>
+                <dd>{move || result.get().breakeven_point_km.round_dp(2).to_string()} km</dd>
+                <dt>Breakeven point (years)</dt>
+                <dd>{move || result.get().breakeven_point_years.round_dp(2).to_string()}</dd>
+            </dl>
         </section>
     }
 }

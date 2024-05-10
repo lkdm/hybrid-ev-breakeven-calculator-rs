@@ -7,6 +7,9 @@ This is the input CSS file for Tailwind. You can add custom CSS here.
 
 @layer base {
     html {
-        @apply bg-gray-800;
+        @apply bg-black;
+        @apply font-sans;
+        @apply antialiased;
+        @apply leading-tight;
     }
 }
