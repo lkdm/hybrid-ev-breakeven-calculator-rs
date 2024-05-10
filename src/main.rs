@@ -5,7 +5,6 @@ use leptos::*;
 use leptos_router::*;
 use rust_decimal::prelude::*;
 use serde::{Deserialize, Serialize};
-use serde_urlencoded;
 use web_sys::SubmitEvent;
 extern crate console_error_panic_hook;
 
@@ -142,12 +141,7 @@ fn break_even_point_years(
 fn FormExample() -> impl IntoView {
     let (result, set_result) = create_signal::<OutputState>(OutputState::default());
     let (query, set_query) = hooks::create_query_struct_signal::<InputState>();
-    let default_values = query.get().unwrap();
-
-    logging::log!("{:?}", default_values);
-
-    // let state = expect_context::<RwSignal<GlobalState>>();
-    // let input = (move || state.with(|state| state.input_state.clone()))();
+    let default_values = query.get().unwrap_or_default();
 
     let handle_submit = move |ev: SubmitEvent| {
         ev.prevent_default();
@@ -159,14 +153,6 @@ fn FormExample() -> impl IntoView {
             }
         };
         set_query(Some(data.clone()));
-        // let qs = data.to_query_string();
-        // let path = location.pathname.get_untracked();
-        // let hash = location.hash.get_untracked();
-        // let new_url = format!("{path}?{qs}{hash}");
-        // navigate(&new_url, NavigateOptions::default());
-        // use_navigate().push(format!("/?{}", qs));
-        // update_query_string(data);
-        // TODO: DivisionByZero error
         let hybrid_fuel_cost = data.fuel_cost * data.hybrid_fuel_litres_per_km;
         let petrol_fuel_cost = data.fuel_cost * data.ice_fuel_litres_per_km;
         let upfront_cost_difference = data.hybrid_upfront_cost - data.ice_upfront_cost;

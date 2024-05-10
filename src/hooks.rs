@@ -1,7 +1,6 @@
 use leptos::*;
 use leptos_router::*;
 use serde::Serialize;
-use serde_urlencoded;
 
 #[track_caller]
 pub fn create_query_struct_signal<T>() -> (Memo<Result<T, ParamsError>>, SignalSetter<Option<T>>)
