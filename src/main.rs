@@ -170,35 +170,30 @@ fn FormExample() -> impl IntoView {
                 </fieldset>
                 <fieldset>
                     <legend>Personal Details</legend>
-                    <div>
-                        <label>Kilometres driven per year</label>
+                    <FormField label="Kilometres driven per year".to_string()>
                         <NumberInput handle_input={set_annual_km_driven} value={annual_km_driven}/>
-                    </div>
+                    </FormField>
                 </fieldset>
                 <fieldset>
                     <legend>Hybrid Vehicle Details</legend>
-                    <div>
-                        <label for="rate">Estimated drive-away price</label>
+                    <FormField label="Estimated drive-away price".to_string()>
                         <NumberInput handle_input={set_hybrid_upfront_cost} value={hybrid_upfront_cost}/>
-                    </div>
-                    <div>
-                        <label for="rate">Estimated fuel economy (L/100km)</label>
+                    </FormField>
+                    <FormField label="Estimated fuel economy (L/100km)".to_string()>
                         <NumberInput handle_input={set_hybrid_efficiency} value={hybrid_efficiency}/>
-                    </div>
+                    </FormField>
                     <div>
                         <p>Petrol cost/km: {hybrid_fuel_cost}</p>
                     </div>
                 </fieldset>
                 <fieldset>
                     <legend>Petrol Vehicle Details</legend>
-                    <div>
-                        <label for="rate">Estimated drive-away price</label>
+                    <FormField label="Estimated drive-away price".to_string()>
                         <NumberInput handle_input={set_petrol_upfront_cost} value={petrol_upfront_cost}/>
-                    </div>
-                    <div>
-                        <label for="rate">Estimated fuel economy (L/100km)</label>
+                    </FormField>
+                    <FormField label="Estimated fuel economy (L/100km)".to_string()>
                         <NumberInput handle_input={set_petrol_efficiency} value={petrol_efficiency}/>
-                    </div>
+                    </FormField>
                     <div>
                         <p>Petrol cost/km: {petrol_fuel_cost}</p>
                     </div>
