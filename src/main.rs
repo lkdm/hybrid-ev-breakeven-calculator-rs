@@ -70,7 +70,8 @@ pub fn FormField(label: String, children: Children) -> impl IntoView {
 
 #[component]
 fn FormExample() -> impl IntoView {
-    // Inputs
+    // At the time of writing there was no way to create query signals for an entire
+    // struct. This is because structs are known at compile time.
     let (fuel_cost, set_fuel_cost) = create_query_signal::<String>("fuel_cost");
     let (hybrid_upfront_cost, set_hybrid_upfront_cost) =
         create_query_signal::<String>("hybrid_upfront_cost");
@@ -157,7 +158,10 @@ fn FormExample() -> impl IntoView {
             <header class="">
                 <h1>Hybrid EV Breakeven Calculator</h1>
                 <aside>
-                    Calculate the breakeven point for a hybrid electric vehicle compared to a petrol vehicle.
+                    <p>
+                        Is it worth buying a hybrid electric vehicle over a petrol vehicle?
+                        Use this calculator to find out.
+                    </p>
                 </aside>
             </header>
             <section>

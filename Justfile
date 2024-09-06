@@ -12,3 +12,7 @@ run:
 	@echo "Running the app"
 	cargo clippy --fix & cargo fmt
 	trunk serve --port 3000 --open
+
+build-release:
+	@echo "Building the app for release"
+	trunk build --release

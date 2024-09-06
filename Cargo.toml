@@ -8,3 +8,14 @@ edition = "2021"
 [dependencies]
 leptos = { version = "0.6.11", features = ["csr", "nightly"] }
 leptos_router = { version = "=0.6.8", features = ["csr", "nightly"] }
+
+[profile.wasm-release]
+# Optimises the bundle for release.
+inherits = "release"
+opt-level = 'z'
+lto = true
+codegen-units = 1
+
+[package.metadata.leptos]
+# ....
+lib-profile-release = "wasm-release"
