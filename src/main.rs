@@ -5,7 +5,7 @@ use leptos_router::*;
 fn App() -> impl IntoView {
     view! {
         <Router>
-            <main>
+            <main class="flex justify-center">
                 <Routes>
                     <Route path="" view=FormExample/>
                 </Routes>
@@ -47,6 +47,7 @@ pub fn NumberInput(
     };
     view! {
         <input
+            class="border px-3 py-1 bg-transparent rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
             type="number"
             on:keypress=handle_enforce_monetary_rules
             on:input=move |ev| {
@@ -54,6 +55,16 @@ pub fn NumberInput(
             }
             prop:value=value
         />
+    }
+}
+
+#[component]
+pub fn FormField(label: String, children: Children) -> impl IntoView {
+    view! {
+        <div class="grid w-full max-w-sm items-center gap-1.5">
+            <label class="text-sm font-bold">{label}</label>
+            {children()}
+        </div>
     }
 }
 
@@ -142,61 +153,73 @@ fn FormExample() -> impl IntoView {
     });
 
     view! {
-        <div>
-            <h2>Hybrid EV Breakeven Calculator</h2>
-            <Form method="GET" action="">
-            <fieldset>
-                <legend>Economy Details</legend>
-                <div>
-                    <label>Estimated fuel price</label>
-                    <NumberInput handle_input={set_fuel_cost} value={fuel_cost}/>
-                </div>
-            </fieldset>
-            <fieldset>
-                <legend>Personal Details</legend>
-                <div>
-                    <label>Kilometres driven per year</label>
-                    <NumberInput handle_input={set_annual_km_driven} value={annual_km_driven}/>
-                </div>
-            </fieldset>
-            <fieldset>
-                <legend>Hybrid Vehicle Details</legend>
-                <div>
-                    <label for="rate">Estimated drive-away price</label>
-                    <NumberInput handle_input={set_hybrid_upfront_cost} value={hybrid_upfront_cost}/>
-                </div>
-                <div>
-                    <label for="rate">Estimated fuel economy (L/100km)</label>
-                    <NumberInput handle_input={set_hybrid_efficiency} value={hybrid_efficiency}/>
-                </div>
-                <div>
-                    <p>Petrol cost/km: {hybrid_fuel_cost}</p>
-                </div>
-            </fieldset>
-            <fieldset>
-                <legend>Petrol Vehicle Details</legend>
-                <div>
-                    <label for="rate">Estimated drive-away price</label>
-                    <NumberInput handle_input={set_petrol_upfront_cost} value={petrol_upfront_cost}/>
-                </div>
-                <div>
-                    <label for="rate">Estimated fuel economy (L/100km)</label>
-                    <NumberInput handle_input={set_petrol_efficiency} value={petrol_efficiency}/>
-                </div>
-                <div>
-                    <p>Petrol cost/km: {petrol_fuel_cost}</p>
-                </div>
+        <article class="w-full max-w-screen-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto p-4">
+            <header class="">
+                <h1>Hybrid EV Breakeven Calculator</h1>
+                <aside>
+                    Calculate the breakeven point for a hybrid electric vehicle compared to a petrol vehicle.
+                </aside>
+            </header>
+            <section>
+                <Form method="GET" action="">
+                <fieldset>
+                    <legend>Economy Details</legend>
+                    <FormField label="Estimated fuel price".to_string()>
+                        <NumberInput handle_input={set_fuel_cost} value={fuel_cost}/>
+                    </FormField>
                 </fieldset>
+                <fieldset>
+                    <legend>Personal Details</legend>
+                    <div>
+                        <label>Kilometres driven per year</label>
+                        <NumberInput handle_input={set_annual_km_driven} value={annual_km_driven}/>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Hybrid Vehicle Details</legend>
+                    <div>
+                        <label for="rate">Estimated drive-away price</label>
+                        <NumberInput handle_input={set_hybrid_upfront_cost} value={hybrid_upfront_cost}/>
+                    </div>
+                    <div>
+                        <label for="rate">Estimated fuel economy (L/100km)</label>
+                        <NumberInput handle_input={set_hybrid_efficiency} value={hybrid_efficiency}/>
+                    </div>
+                    <div>
+                        <p>Petrol cost/km: {hybrid_fuel_cost}</p>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Petrol Vehicle Details</legend>
+                    <div>
+                        <label for="rate">Estimated drive-away price</label>
+                        <NumberInput handle_input={set_petrol_upfront_cost} value={petrol_upfront_cost}/>
+                    </div>
+                    <div>
+                        <label for="rate">Estimated fuel economy (L/100km)</label>
+                        <NumberInput handle_input={set_petrol_efficiency} value={petrol_efficiency}/>
+                    </div>
+                    <div>
+                        <p>Petrol cost/km: {petrol_fuel_cost}</p>
+                    </div>
+                    </fieldset>
 
-            </Form>
-            <h2>Outcome</h2>
-            <div>
-                <p>Upfront cost difference: {upfront_cost_difference}</p>
-                <p>Per kilometre fuel cost difference: {per_kilometre_fuel_cost_difference}</p>
-                <p>Breakeven point: {breakeven_point}</p>
-                <p>Breakeven point in years: {breakeven_point_years}</p>
-            </div>
-        </div>
+                </Form>
+            </section>
+            <section>
+                <h2>Outcome</h2>
+                <dl>
+                    <dt>Upfront cost difference</dt>
+                    <dd>{upfront_cost_difference}</dd>
+                    <dt>Per kilometre fuel cost difference</dt>
+                    <dd>{per_kilometre_fuel_cost_difference}</dd>
+                    <dt>Breakeven point</dt>
+                    <dd>{breakeven_point}</dd>
+                    <dt>Breakeven point in years</dt>
+                    <dd>{breakeven_point_years}</dd>
+                </dl>
+            </section>
+        </article>
     }
 }
 

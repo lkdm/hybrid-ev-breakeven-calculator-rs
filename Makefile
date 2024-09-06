@@ -5,6 +5,9 @@ init:
 	rustup override set nightly
 	rustup target add wasm32-unknown-unknown
 
+css:
+	tailwindcss -i ./src/style.css -o ./tailwind.css --watch
+
 run:
 	@echo "Running the app"
 	cargo clippy --fix & cargo fmt
