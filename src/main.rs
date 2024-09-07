@@ -1,16 +1,11 @@
 use leptos::*;
-use leptos_router::*;
 
 #[component]
 fn App() -> impl IntoView {
     view! {
-        <Router>
             <main class="flex justify-center">
-                <Routes>
-                    <Route path="" view=FormExample/>
-                </Routes>
+                <FormExample />
             </main>
-        </Router>
     }
 }
 
