@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 leptos = { version = "0.6.11", features = ["csr", "nightly"] }
+mammon_newtype = "0.1.2"
 
 [profile.wasm-release]
 # Optimises the bundle for release.
